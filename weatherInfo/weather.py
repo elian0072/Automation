@@ -21,8 +21,6 @@ EMAIL_PASSWORD = os.environ.get('GMAIL_PSWD')
 MAIL_SUBJECT = 'Weather Report [Pyhton Script]'
 MAIL_SMTP = 'smtp.gmail.com'
 
-logging.info(EMAIL_ADDRESS)
-logging.info(EMAIL_PASSWORD)
 
 with open(myFile) as config_json:
     config = json.load(config_json)
