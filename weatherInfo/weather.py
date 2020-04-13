@@ -10,6 +10,9 @@ import datetime
 
 ######## INITIALIZATION ###########
 
+logging.basicConfig(filename='logs.txt', level=logging.INFO,
+ format='%(asctime)s -- %(levelname)s : %(message)s')
+
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 myFile = os.path.join(THIS_FOLDER, r'Data/configs.json')
 
@@ -18,11 +21,12 @@ EMAIL_PASSWORD = os.environ.get('GMAIL_PSWD')
 MAIL_SUBJECT = 'Weather Report [Pyhton Script]'
 MAIL_SMTP = 'smtp.gmail.com'
 
+logging.info(EMAIL_ADDRESS)
+logging.info(EMAIL_PASSWORD)
+
 with open(myFile) as config_json:
     config = json.load(config_json)
 
-logging.basicConfig(filename='weatherLogs.txt', level=logging.INFO,
- format='%(levelname)s:%(message)s')
 
 ######## FUNCTIONS ###########
 
@@ -40,8 +44,8 @@ def formatMailMessage(data):
     probarain = data['probarain']
 
     message = "Prévision météo du jour:\n\nPrévision: "+str(weather)+\
-    "\nTempérature minimal: "+ str(minTemp) + "degrés"+ \
-    "\nTempérature maximal: "+ str(maxTemp) +"degrés"+\
+    "\nTempérature minimal: "+ str(minTemp) + " degrés"+ \
+    "\nTempérature maximal: "+ str(maxTemp) +" degrés"+\
     "\nProbabilité de pluie: "+ str(probarain)+"%"+\
     "\nRapport généré le " + datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     logging.info('Message formatted')
@@ -54,11 +58,13 @@ def sendMailReport(message):
     msg['To']= ['Jaime <jaime.balbuena@me.com>']
     msg.set_content(message)
 
-    with smtplib.SMTP_SSL(MAIL_SMTP, 465) as smtp:
-	    smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-	    smtp.send_message(msg)
-
-    logging.info('Mail sent')
+    try:
+        with smtplib.SMTP_SSL(MAIL_SMTP, 465) as smtp:
+            smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            smtp.send_message(msg)
+        logging.info('Mail sent')
+    except Exception:
+        logging.exception('Something went wrong with sending the email')
 
 def main():
     logging.info('Start Main')
